@@ -1,6 +1,6 @@
 # Pump.fun Trading Bot
 
-A comprehensive, production-ready trading bot for [Pump.fun](https://pump.fun) using the [PumpPortal API](https://github.com/thetateman/Pump-Fun-API). This bot implements multiple trading strategies, risk management, and portfolio tracking to automate trading on the Pump.fun platform.
+A comprehensive, trading bot for [Pump.fun](https://pump.fun) using the [PumpPortal API](https://github.com/thetateman/Pump-Fun-API). This bot implements multiple trading strategies, risk management, and portfolio tracking to automate trading on the Pump.fun platform.
 
 ## Summary
 
@@ -232,6 +232,10 @@ export const executeTrade = async (tradeRequest: TradeRequest): Promise<TradeRes
 ## Disclaimer
 
 Trading cryptocurrencies involves significant risk. This bot is provided as-is with no guarantees. Use at your own risk. Always start with small amounts and test thoroughly before committing significant funds.
+
+## Donations
+
+solana: 8qRJ8ySKdCKyZnvxCCMLQyBQPZgWSofy5Uine3ew9Rtg
 
 ## License
 
