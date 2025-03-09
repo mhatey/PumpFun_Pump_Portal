@@ -37,9 +37,12 @@ export const loadConfig = (): BotConfig => {
     fs.mkdirSync(logDir, { recursive: true });
   }
 
+  // For wallet configuration, we now rely on the Wallet class to handle security
+  // We only need the public key in the config
   return {
     wallet: {
-      privateKey: validateEnv('WALLET_PRIVATE_KEY'),
+      // Private key will be loaded securely by the Wallet class
+      privateKey: '', // No longer loaded directly in the config
       publicKey: validateEnv('WALLET_PUBLIC_KEY'),
     },
     api: {

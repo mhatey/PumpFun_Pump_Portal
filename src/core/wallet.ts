@@ -5,6 +5,8 @@ import {
   VersionedTransaction 
 } from '@solana/web3.js';
 import bs58 from 'bs58';
+import fs from 'fs';
+import path from 'path';
 import { config } from '../config';
 import logger from '../utils/logger';
 import { getLocalTransaction } from '../api/pumpPortalApi';
@@ -20,13 +22,61 @@ export class Wallet {
    */
   constructor() {
     this.connection = new Connection(config.api.rpcEndpoint, 'confirmed');
-    this.keypair = Keypair.fromSecretKey(bs58.decode(config.wallet.privateKey));
+    this.keypair = this.loadKeypair();
     
     // Verify the derived public key matches the configured one
     const derivedPublicKey = this.keypair.publicKey.toBase58();
     if (derivedPublicKey !== config.wallet.publicKey) {
       logger.warn(`Derived public key ${derivedPublicKey} does not match configured public key ${config.wallet.publicKey}`);
     }
+  }
+
+  /**
+   * Load the keypair from the configured source
+   */
+  private loadKeypair(): Keypair {
+    // Option 1: Direct private key from env file
+    if (process.env.WALLET_PRIVATE_KEY) {
+      logger.debug('Loading private key from environment variable WALLET_PRIVATE_KEY');
+      return Keypair.fromSecretKey(bs58.decode(process.env.WALLET_PRIVATE_KEY));
+    }
+    
+    // Option 2: Load from a separate file
+    if (process.env.WALLET_PRIVATE_KEY_FILE) {
+      try {
+        logger.debug(`Loading private key from file: ${process.env.WALLET_PRIVATE_KEY_FILE}`);
+        const keyFile = path.resolve(process.env.WALLET_PRIVATE_KEY_FILE);
+        const privateKeyString = fs.readFileSync(keyFile, 'utf-8').trim();
+        return Keypair.fromSecretKey(bs58.decode(privateKeyString));
+      } catch (error) {
+        logger.error(`Failed to load private key from file: ${error instanceof Error ? error.message : String(error)}`);
+        throw new Error('Failed to load wallet private key from file');
+      }
+    }
+    
+    // Option 3: Load from OS environment variable
+    if (process.env.WALLET_PRIVATE_KEY_ENV) {
+      const envVarName = process.env.WALLET_PRIVATE_KEY_ENV;
+      const privateKeyFromEnv = process.env[envVarName];
+      
+      if (!privateKeyFromEnv) {
+        throw new Error(`Environment variable ${envVarName} is not set`);
+      }
+      
+      logger.debug(`Loading private key from environment variable ${envVarName}`);
+      return Keypair.fromSecretKey(bs58.decode(privateKeyFromEnv));
+    }
+    
+    // Option 4: Hardware wallet support would be implemented here
+    // This is a placeholder for future implementation
+    if (process.env.WALLET_HARDWARE_PATH) {
+      // This would require additional libraries and implementation
+      logger.error('Hardware wallet support is not yet implemented');
+      throw new Error('Hardware wallet support is not yet implemented');
+    }
+    
+    // If no key source is specified, throw an error
+    throw new Error('No wallet private key source specified. Please configure one of the WALLET_PRIVATE_KEY options.');
   }
 
   /**

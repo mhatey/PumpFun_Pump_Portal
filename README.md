@@ -108,8 +108,39 @@ npm run dev
 The bot is highly configurable through the `.env` file. Here are the key configuration options:
 
 ### Wallet Configuration
-- `WALLET_PRIVATE_KEY`: Your Solana wallet private key (base58 encoded)
 - `WALLET_PUBLIC_KEY`: Your Solana wallet public key
+
+For your private key, several secure options are available:
+1. `WALLET_PRIVATE_KEY`: Direct private key in the `.env` file (least secure, not recommended for production)
+2. `WALLET_PRIVATE_KEY_FILE`: Path to a separate file containing only your private key (better security)
+3. `WALLET_PRIVATE_KEY_ENV`: Name of an OS environment variable containing your private key (good security)
+4. `WALLET_HARDWARE_PATH`: For hardware wallet integration (best security, requires additional setup)
+
+#### Secure Private Key Handling
+
+For production use, we recommend using one of the more secure options:
+
+**Option 1: Using a separate key file**
+```bash
+# Create a secure key file with restricted permissions
+echo "your_base58_private_key" > /path/to/secure/key.txt
+chmod 600 /path/to/secure/key.txt
+
+# Reference it in your .env file
+WALLET_PRIVATE_KEY_FILE=/path/to/secure/key.txt
+```
+
+**Option 2: Using OS environment variables**
+```bash
+# On Linux/Mac, add to your .bashrc or .zshrc
+export SOLANA_WALLET_PRIVATE_KEY=your_base58_private_key
+
+# On Windows
+setx SOLANA_WALLET_PRIVATE_KEY your_base58_private_key
+
+# Then in your .env file
+WALLET_PRIVATE_KEY_ENV=SOLANA_WALLET_PRIVATE_KEY
+```
 
 ### API Configuration
 - `PUMPPORTAL_API_KEY`: Your PumpPortal API key
